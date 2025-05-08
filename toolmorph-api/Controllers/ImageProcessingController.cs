@@ -21,5 +21,13 @@ namespace toolmorph_api.Controllers
         {
             return await _imgProcessingService.ExtractPalette(file);
         }
+
+        [HttpPost("background-remover")]
+        public async Task<IActionResult> RemoveBackground(IFormFile file)
+        {
+            var result = await _imgProcessingService.RemoveBackground(file);
+
+            return File(result.FileBytes, result.ContentType, result.FileName);
+        }
     }
 }

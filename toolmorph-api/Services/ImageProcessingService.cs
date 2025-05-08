@@ -1,5 +1,6 @@
 ﻿using toolmorph_api.Models;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace toolmorph_api.Services
 {
@@ -36,5 +37,32 @@ namespace toolmorph_api.Services
             return paletteResponse ?? new PaletteResponse { Palettes = ["ERROR"] };
         }
 
+        public async Task<RemovedBackgroundResponse> RemoveBackground(IFormFile file)
+        {
+            var formData = new MultipartFormDataContent();
+            var fileStream = file.OpenReadStream();
+            var fileContent = new StreamContent(fileStream);
+
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+            formData.Add(fileContent, "file", file.FileName);
+
+            var response = await _httpClient.PostAsync($"{_baseUrl}/background-remover", formData);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Failed to remove background: {response.StatusCode}");
+            }
+
+            byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
+
+            var result = new RemovedBackgroundResponse
+            {
+                FileBytes = imageBytes,
+                FileName = "removed_background.png",
+                ContentType = "image/png"
+            };
+
+            return result;
+        }
     }
 }
