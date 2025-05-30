@@ -37,6 +37,29 @@ namespace toolmorph_api.Services
             return paletteResponse ?? new PaletteResponse { Palettes = ["ERROR"] };
         }
 
+        public async Task<ObjectDetectionResponse> ObjectDetection(IFormFile file)
+        {
+            var formData = new MultipartFormDataContent();
+            var fileStream = file.OpenReadStream();
+            var fileContent = new StreamContent(fileStream);
+
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+            formData.Add(fileContent, "file", file.FileName);
+
+            var response = await _httpClient.PostAsync($"{_baseUrl}/object-detection", formData);
+
+            if(!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Failed to detect objects: {response.StatusCode}");
+                return new ObjectDetectionResponse { Predictions = [] };
+            }
+
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var objectDetectionResponse = JsonConvert.DeserializeObject<ObjectDetectionResponse>(jsonString);
+
+            return objectDetectionResponse ?? new ObjectDetectionResponse { Predictions = [] };
+        }
+
         public async Task<RemovedBackgroundResponse> RemoveBackground(IFormFile file)
         {
             var formData = new MultipartFormDataContent();

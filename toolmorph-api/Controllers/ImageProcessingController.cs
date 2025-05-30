@@ -29,5 +29,11 @@ namespace toolmorph_api.Controllers
 
             return File(result.FileBytes, result.ContentType, result.FileName);
         }
+
+        [HttpPost("object-detection")]
+        public async Task<ObjectDetectionResponse> DetectObject(IFormFile file)
+        {
+            return await _imgProcessingService.ObjectDetection(file);
+        }
     }
 }

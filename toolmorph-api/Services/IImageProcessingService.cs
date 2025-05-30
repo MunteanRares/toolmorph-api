@@ -7,5 +7,6 @@ namespace toolmorph_api.Services
     {
         Task<PaletteResponse> ExtractPalette(IFormFile image);
         Task<RemovedBackgroundResponse> RemoveBackground(IFormFile file);
+        Task<ObjectDetectionResponse> ObjectDetection(IFormFile file);
     }
 }
